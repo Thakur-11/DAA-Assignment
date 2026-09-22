@@ -1,0 +1,153 @@
+LC:88
+class Solution {
+    public void merge(int[] nums1, int m, int[] nums2, int n) {
+        int p1 = m - 1;
+        int p2 = n - 1;
+        int p = m + n - 1;
+
+        while (p1 >= 0 && p2 >= 0) {
+            if (nums1[p1] > nums2[p2]) {
+                nums1[p] = nums1[p1];
+                p1--;
+            } else {
+                nums1[p] = nums2[p2];
+                p2--;
+            }
+            p--;
+        }
+
+        while (p2 >= 0) {
+            nums1[p] = nums2[p2];
+            p2--;
+            p--;
+        }
+    }
+}
+
+LC:912
+class Solution {
+    public int[] sortArray(int[] nums) {
+        if (nums == null || nums.length <= 1) {
+            return nums;
+        }
+        mergeSort(nums, 0, nums.length - 1);
+        return nums;
+    }
+
+    private void mergeSort(int[] nums, int left, int right) {
+        if (left >= right) {
+            return;
+        }
+        int mid = left + (right - left) / 2;
+        mergeSort(nums, left, mid);
+        mergeSort(nums, mid + 1, right);
+        merge(nums, left, mid, right);
+    }
+
+    private void merge(int[] nums, int left, int mid, int right) {
+        int[] temp = new int[right - left + 1];
+        int i = left;
+        int j = mid + 1;
+        int k = 0;
+
+        while (i <= mid && j <= right) {
+            if (nums[i] <= nums[j]) {
+                temp[k++] = nums[i++];
+            } else {
+                temp[k++] = nums[j++];
+            }
+        }
+
+        while (i <= mid) {
+            temp[k++] = nums[i++];
+        }
+
+        while (j <= right) {
+            temp[k++] = nums[j++];
+        }
+
+        System.arraycopy(temp, 0, nums, left, temp.length);
+    }
+}
+
+LC:215
+class Solution {
+    public int findKthLargest(int[] nums, int k) {
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
+
+        for (int num : nums) {
+            if (num < min) min = num;
+            if (num > max) max = num;
+        }
+
+        int[] count = new int[max - min + 1];
+        for (int num : nums) {
+            count[num - min]++;
+        }
+
+        int remain = k;
+        for (int i = count.length - 1; i >= 0; i--) {
+            remain -= count[i];
+            if (remain <= 0) {
+                return i + min;
+            }
+        }
+
+        return -1;
+    }
+}
+
+LC:53
+class Solution {
+    public int maxSubArray(int[] nums) {
+        int maxSoFar = nums[0];
+        int currentMax = nums[0];
+
+        for (int i = 1; i < nums.length; i++) {
+            currentMax = Math.max(nums[i], currentMax + nums[i]);
+            maxSoFar = Math.max(maxSoFar, currentMax);
+        }
+
+        return maxSoFar;
+    }
+}
+
+LC:4
+class Solution {
+    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
+        if (nums1.length > nums2.length) {
+            return findMedianSortedArrays(nums2, nums1);
+        }
+        
+        int m = nums1.length;
+        int n = nums2.length;
+        int left = 0;
+        int right = m;
+        
+        while (left <= right) {
+            int partitionX = (left + right) / 2;
+            int partitionY = (m + n + 1) / 2 - partitionX;
+            
+            int maxLeftX = (partitionX == 0) ? Integer.MIN_VALUE : nums1[partitionX - 1];
+            int minRightX = (partitionX == m) ? Integer.MAX_VALUE : nums1[partitionX];
+            
+            int maxLeftY = (partitionY == 0) ? Integer.MIN_VALUE : nums2[partitionY - 1];
+            int minRightY = (partitionY == n) ? Integer.MAX_VALUE : nums2[partitionY];
+            
+            if (maxLeftX <= minRightY && maxLeftY <= minRightX) {
+                if ((m + n) % 2 == 0) {
+                    return ((double) Math.max(maxLeftX, maxLeftY) + Math.min(minRightX, minRightY)) / 2.0;
+                } else {
+                    return (double) Math.max(maxLeftX, maxLeftY);
+                }
+            } else if (maxLeftX > minRightY) {
+                right = partitionX - 1;
+            } else {
+                left = partitionX + 1;
+            }
+        }
+        
+        throw new IllegalArgumentException();
+    }
+}
